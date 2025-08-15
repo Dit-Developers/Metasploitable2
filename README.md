@@ -1,97 +1,80 @@
-# 🔍 Vulnerability Assessment on Metasploitable2 using Nmap and Nessus
 
-## 📌 Overview
+Metasploitable 2: A Hands-On Guide to Vulnerability Scanning and Exploitation
 
-This project demonstrates a vulnerability assessment on **Metasploitable2**, a deliberately vulnerable Linux machine, using a combination of **Nmap**, **Nessus Essentials**, and manual CVE research. The goal was to identify open ports, detect service versions, and uncover known security vulnerabilities that could potentially be exploited by attackers. The assessment includes both manual enumeration techniques and automated vulnerability scanning for comprehensive coverage.
+Metasploitable 2 is a deliberately vulnerable Linux virtual machine designed for security professionals and enthusiasts to practice penetration testing and vulnerability assessment techniques. Developed by Rapid7, it offers a safe environment to explore various vulnerabilities commonly found in real-world systems.
 
+Setting Up Metasploitable 2
 
-## 🛠 Tools Used
+To get started, download the Metasploitable 2 VM image from the official repository. Import the VM into your preferred virtualization platform, such as VirtualBox or VMware. Once set up, start the VM and log in using the default credentials:
 
-- **Nmap** – Port scanning, service/version detection, and NSE vulnerability scripts
-- **Nessus Essentials** – Vulnerability scanner used to detect critical and high-risk issues with CVE references and remediation guidance.
-- **Kali Linux** – Attacker machine
-- **Metasploitable2** – Vulnerable target machine (metaspolitable2 ip)
-- **Manual CVE Analysis** – Researched vulnerabilities based on Nmap findings
+- Username: msfadmin
+- Password: msfadmin
 
+Ensure that both your attacking machine (e.g., Kali Linux) and the Metasploitable 2 VM are on the same network to facilitate communication.
 
-## 📶 Lab Setup
+Basic Vulnerability Scanning with Nmap
 
-| Component         | IP Address     |
-|------------------|----------------|
-| Attacker Machine | kali linux  |
-| Target Machine   | metasploitable2  |
+The first step in any penetration test is reconnaissance. Nmap (Network Mapper) is a powerful tool for discovering hosts and services on a network. To perform a basic scan of the Metasploitable 2 VM, use the following command:
 
-- Network: Host-Only Adapter (isolated environment)
+nmap -sS -sV -O <target_ip>
 
+- -sS: Performs a SYN scan (stealth scan).
+- -sV: Detects service versions.
+- -O: Attempts to determine the operating system.
 
-## 🧪1: Nmap Scan - Steps Performed
+This scan will provide information about open ports, running services, and their versions, which are crucial for identifying potential vulnerabilities.
 
-1. **Basic Port Scan**  
-   Identified open ports using `nmap <target-ip>`
+Identifying Vulnerabilities with Nessus
 
-2. **Service & Version Detection**  
-   Detected versions of running services:  
-   `nmap -sV <target-ip>`
+While Nmap provides basic information, Nessus offers a more comprehensive vulnerability assessment. Nessus Essentials is a free version suitable for personal use. After installing Nessus on your attacking machine, log in to the web interface and create a new scan targeting the Metasploitable 2 IP address.
 
-3. **Aggressive Scan with OS Detection**  
-   `nmap -A <target-ip>`
+Nessus will perform an in-depth analysis and generate a report detailing discovered vulnerabilities, their severity, and potential remediation steps. This report is invaluable for planning exploitation strategies.
 
-4. **Vulnerability Script Scan**  
-   Used built-in Nmap NSE scripts:  
-   `nmap --script vuln <target-ip>`
+Exploiting Vulnerabilities with Metasploit
 
-5. **Manual CVE Lookup**  
-   Based on Nmap output, identified known vulnerabilities with CVEs
+Metasploit is a powerful framework for developing and executing exploit code against a remote target machine. After identifying vulnerabilities, you can use Metasploit to attempt exploitation.
 
+For instance, if Nmap or Nessus identifies a vulnerable FTP service (e.g., vsftpd 2.3.4), you can exploit it using Metasploit:
 
-## 📝 Key Vulnerabilities Found
+1. Launch Metasploit:
 
-| Port | Service    | Version        | Vulnerability                        | CVE ID         | Risk  | Mitigation Suggestion                          |
-|------|------------|----------------|--------------------------------------|----------------|-------|------------------------------------------------|
-| 21   | vsftpd     | 2.3.4          | Backdoor command execution           | CVE-2011-2523  | High  | Disable vsftpd or upgrade to secure version   |
-| 443  | OpenSSL    | TLS/SSL        | Weak Diffie-Hellman key exchange     | CVE-2015-4000  | High  | Use strong ciphers, disable weak DH suites    |
-| 443  | SSL/TLS    | SSLv3 Enabled  | SSLv3 vulnerability (POODLE attack)  | CVE-2014-3566  | Medium| Disable SSLv3, enforce TLS 1.2 or higher       |
+msfconsole
 
----
+2. Search for the exploit:
 
-## 📸 Screenshots
+search vsftpd
 
-![p1](https://github.com/user-attachments/assets/28bd35d5-ef6b-4c16-b293-f62c0b37b163)
-![p2](https://github.com/user-attachments/assets/71f186d5-80ce-44c3-9e1e-723cf8f4fae9)
-![p3](https://github.com/user-attachments/assets/714d245a-fa23-48d4-a288-78978c24fa2d)
-![p4](https://github.com/user-attachments/assets/6710c0f6-c4ee-4133-8d15-8aff96ea65fd)
-![p5](https://github.com/user-attachments/assets/57be62f6-3ed4-4179-8eb0-97e847d87d82)
+3. Select the appropriate exploit:
 
+use exploit/unix/ftp/vsftpd_234_backdoor
 
+4. Set the target IP:
 
+set RHOST <target_ip>
 
-## 🛡 Mitigation Summary
+5. Run the exploit:
 
-- Disable insecure services like FTP and Telnet
-- Apply security patches to known vulnerable services
-- Upgrade legacy software to supported, secure versions
-- Enforce strong encryption and modern SSL/TLS protocols
+exploit
 
+If successful, you will gain a shell on the target machine, allowing you to further investigate and exploit other vulnerabilities.
 
----
+Top 10 Exploits in Metasploitable 2
 
-## 2. 🧪 Nessus Vulnerability Scan 
+The metasploitable2_exploits.txt file in the GitHub repository lists the top 10 exploits for Metasploitable 2. These include:
 
-To strengthen the assessment, a Nessus scan was also performed on the Metasploitable2 machine. This helped in identifying additional high-risk vulnerabilities with detailed CVE information and mitigation suggestions.
+1. vsftpd 2.3.4 Backdoor Command Execution
+2. UnrealIRCd 3.2.8.1 Backdoor Command Execution
+3. Samba 3.0.20-4 usermap script Command Execution
+4. Apache 2.2.8 mod_rewrite Command Execution
+5. PostgreSQL 8.3.0-1 Backdoor Command Execution
+6. MySQL 5.0.51a-3ubuntu5.1 Backdoor Command Execution
+7. ProFTPD 1.3.1 Backdoor Command Execution
+8. Joomla! 1.5.9 SQL Injection
+9. Drupal 6.8 SQL Injection
+10. PHP CGI Argument Injection
 
-### 🔍 Nessus Scan Summary
+Conclusion
 
-- Scan Type: Advanced Network Scan
-- Target: metasplotable2 ip
-- Total Vulnerabilities Detected: 65
-  - Critical: 11
-  - High: 15
-  - Medium: 39
-  - 
-- Detected **65 vulnerabilities**
-- Identified multiple backdoors, outdated software, and misconfigurations
-- Target OS: **Linux Kernel*
+Metasploitable 2 serves as an excellent platform for learning and practicing penetration testing techniques. By combining tools like Nmap, Nessus, and Metasploit, you can simulate real-world attacks and enhance your cybersecurity skills. Always remember to conduct such activities in a legal and ethical manner, ensuring you have proper authorization before testing any systems.
 
-  
-### 📸 Nessus Screenshot
-![p6](https://github.com/user-attachments/assets/03a1819f-719e-49d9-be32-f4a872ac010e)
+For more detailed guides and tutorials, refer to Metasploit Unleashed and Metasploit Documentation resources.
